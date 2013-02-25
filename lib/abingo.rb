@@ -102,6 +102,12 @@ class Abingo
       end
     end
 
+    # Ensure that this key is in the cache in case the cache is flushed; otherwise, conversions aren't marked.
+    conversion_name = options[:conversion] || options[:conversion_name]
+    tests_listening_to_conversion = Abingo.cache.read("Abingo::tests_listening_to_conversion#{conversion_name}") || []
+    tests_listening_to_conversion += [test_name] unless tests_listening_to_conversion.include? test_name
+    Abingo.cache.write("Abingo::tests_listening_to_conversion#{conversion_name}", tests_listening_to_conversion)
+
     choice = self.find_alternative_for_user(test_name, alternatives)
     participating_tests = Abingo.cache.read("Abingo::participating_tests::#{Abingo.identity}") || []
 
